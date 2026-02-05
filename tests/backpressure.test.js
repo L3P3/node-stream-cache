@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { Writable, Readable } from 'stream';
+import { Writable } from 'stream';
 import StreamCache from '../index.js';
 
 /**
@@ -98,8 +98,6 @@ describe('Backpressure handling', () => {
           callback();
         },
         final(callback) {
-          const endTime = Date.now();
-          const duration = endTime - startTime;
           
           // Verify all data was received
           expect(totalReceived).toBe(size100MB);

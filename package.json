@@ -1,8 +1,5 @@
 {
-  "author": "Felix Geisendörfer <felix@debuggable.com> (http://debuggable.com/)",
-  "contributors": [
-    "L3P3"
-  ],
+  "author": "L3P3",
   "name": "stream-cache",
   "description": "A simple way to cache and replay readable streams.",
   "version": "0.1.0",
