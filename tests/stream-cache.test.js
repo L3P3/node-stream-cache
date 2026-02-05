@@ -370,7 +370,7 @@ describe('StreamCache', () => {
       }).toThrow('options not supported');
     });
 
-    test('getLength() deprecated method should work', () => {
+    test('should support getLength() for backward compatibility', () => {
       const cache = new StreamCache();
       cache.write(Buffer.from('test'));
       
