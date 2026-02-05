@@ -9,6 +9,9 @@
     "url": "git://github.com/felixge/node-stream-cache.git"
   },
   "main": "./index",
+  "scripts": {
+    "test": "bun test"
+  },
   "engines": {
     "node": "*"
   },
