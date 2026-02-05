@@ -113,9 +113,10 @@ describe('Backpressure handling', () => {
           console.log(`Received 100 MB in ${chunkCount} chunks over ${duration}ms`);
           console.log(`Max block time between chunks: ${maxBlockTime}ms`);
           
-          // Verify no single chunk blocked for more than 100ms
+          // Verify no single chunk blocked for more than 50ms
           // This ensures async processing is working
-          expect(maxBlockTime).toBeLessThan(100);
+          // (100ms was too lenient; 50ms better reflects non-blocking behavior)
+          expect(maxBlockTime).toBeLessThan(50);
           
           callback();
           done();
@@ -160,9 +161,8 @@ describe('Backpressure handling', () => {
       
       const dest = createChunkTrackingStream();
       
-      cache.pipe(dest);
-      
-      setTimeout(() => {
+      // Listen for finish event instead of using arbitrary timeout
+      dest.on('finish', () => {
         const chunks = dest.getChunks();
         expect(dest.isEnded()).toBe(true);
         expect(chunks.length).toBeGreaterThan(1);
@@ -176,7 +176,9 @@ describe('Backpressure handling', () => {
         expect(avgChunkSize).toBeLessThanOrEqual(64 * 1024); // At most 64KB
         
         done();
-      }, 5000);
+      });
+      
+      cache.pipe(dest);
     }, 10000);
   });
 
@@ -194,9 +196,10 @@ describe('Backpressure handling', () => {
         final(callback) {
           expect(writeCount).toBe(0);
           callback();
-          done();
         }
       });
+      
+      dest.on('finish', done);
       
       cache.pipe(dest);
     });
@@ -217,9 +220,10 @@ describe('Backpressure handling', () => {
         final(callback) {
           expect(received.toString()).toBe('Small test data');
           callback();
-          done();
         }
       });
+      
+      dest.on('finish', done);
       
       cache.pipe(dest);
     });
@@ -237,30 +241,31 @@ describe('Backpressure handling', () => {
       cache.end();
       
       let writeCount = 0;
+      let stopWriting = false;
+      
       const dest = new Writable({
         write(chunk, encoding, callback) {
           writeCount++;
           
           if (writeCount === 3) {
             // Simulate stream becoming unwritable
+            stopWriting = true;
             dest.writable = false;
           }
           
-          callback();
-        },
-        final(callback) {
-          // This should not be called since we made stream unwritable
           callback();
         }
       });
       
       cache.pipe(dest);
       
+      // Use a reasonable timeout to check that writing stopped
       setTimeout(() => {
-        // Should have stopped writing after a few chunks
+        expect(stopWriting).toBe(true);
+        // Should have stopped writing after a few chunks (well under total possible chunks)
         expect(writeCount).toBeLessThan(20);
         done();
-      }, 1000);
+      }, 500);
     });
   });
 
@@ -283,9 +288,10 @@ describe('Backpressure handling', () => {
           expect(received.toString()).toBe(testData);
           expect(received.length).toBe(buffer.length);
           callback();
-          done();
         }
       });
+      
+      dest.on('finish', done);
       
       cache.pipe(dest);
     });
