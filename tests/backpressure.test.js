@@ -72,8 +72,7 @@ describe('Backpressure handling', () => {
       const size100MB = 100 * 1024 * 1024;
       
       // Create a 100 MB buffer filled with pattern
-      const largeBuffer = Buffer.alloc(size100MB);
-      largeBuffer.fill('A');
+      const largeBuffer = Buffer.alloc(size100MB, 'A');
       
       // Write to cache and end
       cache.write(largeBuffer);
@@ -126,8 +125,7 @@ describe('Backpressure handling', () => {
       const size10MB = 10 * 1024 * 1024;
       
       // Create a 10 MB buffer
-      const largeBuffer = Buffer.alloc(size10MB);
-      largeBuffer.fill('B');
+      const largeBuffer = Buffer.alloc(size10MB, 'B');
       
       cache.write(largeBuffer);
       cache.end();
@@ -145,8 +143,7 @@ describe('Backpressure handling', () => {
       const cache = new StreamCache();
       const size5MB = 5 * 1024 * 1024;
       
-      const buffer = Buffer.alloc(size5MB);
-      buffer.fill('C');
+      const buffer = Buffer.alloc(size5MB, 'C');
       
       cache.write(buffer);
       cache.end();
@@ -225,8 +222,7 @@ describe('Backpressure handling', () => {
       const cache = new StreamCache();
       const size1MB = 1024 * 1024;
       
-      const buffer = Buffer.alloc(size1MB);
-      buffer.fill('D');
+      const buffer = Buffer.alloc(size1MB, 'D');
       
       cache.write(buffer);
       cache.end();
@@ -290,8 +286,7 @@ describe('Backpressure handling', () => {
     test('should handle multiple simultaneous pipes after end', (done) => {
       const cache = new StreamCache();
       const size2MB = 2 * 1024 * 1024;
-      const buffer = Buffer.alloc(size2MB);
-      buffer.fill('E');
+      const buffer = Buffer.alloc(size2MB, 'E');
       
       cache.write(buffer);
       cache.end();
