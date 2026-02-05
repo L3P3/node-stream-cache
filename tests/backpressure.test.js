@@ -71,12 +71,9 @@ describe('Backpressure handling', () => {
       const cache = new StreamCache();
       const size100MB = 100 * 1024 * 1024;
       
-      // Create a 100 MB buffer
+      // Create a 100 MB buffer filled with pattern
       const largeBuffer = Buffer.alloc(size100MB);
-      // Fill with some pattern to ensure it's real data
-      for (let i = 0; i < largeBuffer.length; i += 1024) {
-        largeBuffer.write('A'.repeat(Math.min(1024, largeBuffer.length - i)), i);
-      }
+      largeBuffer.fill('A');
       
       // Write to cache and end
       cache.write(largeBuffer);
@@ -135,7 +132,6 @@ describe('Backpressure handling', () => {
       cache.write(largeBuffer);
       cache.end();
       
-      let receivedTotal = 0;
       const dest = createSlowWritableStream((totalBytes, writeCount) => {
         expect(totalBytes).toBe(size10MB);
         expect(writeCount).toBeGreaterThan(1);
