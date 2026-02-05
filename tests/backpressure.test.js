@@ -21,7 +21,7 @@ function createSlowWritableStream(onComplete) {
       // Simulate slow processing to trigger backpressure
       if (currentBufferSize >= maxBufferSize) {
         currentBufferSize = 0;
-        // Small delay to simulate real-world processing
+        // Defer callback to next tick to simulate async processing
         setImmediate(() => callback());
       } else {
         callback();
