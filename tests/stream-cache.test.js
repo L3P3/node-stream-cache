@@ -340,13 +340,14 @@ describe('StreamCache', () => {
       cache.end();
       
       const dest = createCollectorStream();
-      cache.pipe(dest);
       
-      // Data is now delivered asynchronously, so we need to wait
-      setTimeout(() => {
+      // Data is now delivered asynchronously, so we use event-based completion
+      dest.on('finish', () => {
         expect(dest.getData().length).toBe(1024 * 1024);
         done();
-      }, 100);
+      });
+      
+      cache.pipe(dest);
     });
 
     test('should handle end with buffer argument', (done) => {

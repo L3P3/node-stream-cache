@@ -110,12 +110,9 @@ describe('Backpressure handling', () => {
           
           // Verify data was sent in multiple chunks (not one big chunk)
           expect(chunkCount).toBeGreaterThan(1);
-          console.log(`Received 100 MB in ${chunkCount} chunks over ${duration}ms`);
-          console.log(`Max block time between chunks: ${maxBlockTime}ms`);
           
           // Verify no single chunk blocked for more than 50ms
           // This ensures async processing is working
-          // (100ms was too lenient; 50ms better reflects non-blocking behavior)
           expect(maxBlockTime).toBeLessThan(50);
           
           callback();
@@ -142,7 +139,6 @@ describe('Backpressure handling', () => {
       const dest = createSlowWritableStream((totalBytes, writeCount) => {
         expect(totalBytes).toBe(size10MB);
         expect(writeCount).toBeGreaterThan(1);
-        console.log(`Slow stream received ${totalBytes} bytes in ${writeCount} writes`);
         done();
       });
       
@@ -169,7 +165,6 @@ describe('Backpressure handling', () => {
         
         // Verify chunks are reasonably sized (should be around 64KB each)
         const avgChunkSize = size5MB / chunks.length;
-        console.log(`Average chunk size: ${(avgChunkSize / 1024).toFixed(2)} KB across ${chunks.length} chunks`);
         
         // Most chunks should be around 64KB (allow some variance)
         expect(avgChunkSize).toBeGreaterThan(32 * 1024); // At least 32KB
