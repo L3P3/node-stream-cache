@@ -329,7 +329,7 @@ describe('StreamCache', () => {
   });
 
   describe('Edge cases', () => {
-    test('should handle large buffers', () => {
+    test('should handle large buffers', (done) => {
       const cache = new StreamCache();
       const largeBuffer = Buffer.alloc(1024 * 1024); // 1MB
       largeBuffer.fill('a');
@@ -340,9 +340,14 @@ describe('StreamCache', () => {
       cache.end();
       
       const dest = createCollectorStream();
-      cache.pipe(dest);
       
-      expect(dest.getData().length).toBe(1024 * 1024);
+      // Data is now delivered asynchronously, so we use event-based completion
+      dest.on('finish', () => {
+        expect(dest.getData().length).toBe(1024 * 1024);
+        done();
+      });
+      
+      cache.pipe(dest);
     });
 
     test('should handle end with buffer argument', (done) => {
